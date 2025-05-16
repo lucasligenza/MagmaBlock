@@ -9,6 +9,7 @@ class Block:
         self.timestamp = time.time()
         self.data = data
         self.nonce = nonce
+        self.hash = self.compute_hash()
 
     def compute_hash(self):
         """
@@ -36,6 +37,19 @@ class Block:
 
         # Return the hex digest
         return hash_bytes.hexdigest()
+    
+    def mine(self, difficulty):
+        """
+        Try nonces until compute_hash() starts with '0'*difficulty,
+        then store that winning fingerprint in self.hash.
+        """
+        target = '0' * difficulty
+        while True:
+            candidate = self.compute_hash()
+            if candidate.startswith(target):
+                self.hash = candidate
+                break
+            self.nonce += 1
 
 if __name__ == "__main__":
     # Make a test block

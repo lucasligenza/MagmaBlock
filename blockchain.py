@@ -24,7 +24,7 @@ class Blockchain:
         # Return the last block in the chain
         return self.chain[-1] if self.chain else None
     
-    def add_block(self, data):
+    def add_block(self, data, difficulty=2):
         # Use info from the last block to create a new one
         last_block = self.get_last_block()
         new_index = last_block.index + 1
@@ -34,8 +34,8 @@ class Blockchain:
                           previous_hash=last_block.hash,
                           data=data)
         
-        # Compute & store its hash
-        new_block.hash = new_block.compute_hash()
+        # Mine the block (find a valid nonce)
+        new_block.mine(difficulty)
         
         # Add it onto our chain
         self.chain.append(new_block)
@@ -58,12 +58,10 @@ class Blockchain:
 
 if __name__ == "__main__":
     bc = Blockchain()
-    bc.add_block("Block 1 data")
-    bc.add_block("Block 2 data")
+    # Mine two blocks with “2 zeros” difficulty
+    bc.add_block("Block 1 data", difficulty=2)
+    bc.add_block("Block 2 data", difficulty=2)
 
-    print("Before tampering, valid?", bc.is_valid())  # Expect True
+    for block in bc.chain:
+        print(f"#{block.index} | nonce={block.nonce} | hash={block.hash[:8]}…")
 
-    # Tamper with the blockchain
-    bc.chain[1].data = "Data changed."
-
-    print("After tampering, valid?", bc.is_valid())   # Expect False
